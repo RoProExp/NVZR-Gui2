@@ -55,7 +55,7 @@ local Button = Tab:CreateButton({
  })
 
 local Button = Tab:CreateButton({
-    Name = "Undetected Speed 4x",
+    Name = "Undetected Speed 0.5 (Can Hold Speed)",
     Callback = function()
       local Players = game:service("Players")
         local Player = Players.LocalPlayer
