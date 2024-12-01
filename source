@@ -85,7 +85,7 @@ local Button = Tab:CreateButton({
         end
         end)
         runService.Stepped:connect(function()
-        if userInput:IsKeyDown(Enum.KeyCode.LeftShift) then
+        if userInput:IsKeyDown(Enum.KeyCode.LeftControl) then
         humRoot.CFrame = humRoot.CFrame + pHum.MoveDirection * Multiplier
         end
         end)
@@ -2612,7 +2612,7 @@ local Button = Tab:CreateButton({
         end
         end)
         runService.Stepped:connect(function()
-        if userInput:IsKeyDown(Enum.KeyCode.LeftShift) then
+        if userInput:IsKeyDown(Enum.KeyCode.LeftControl) then
         humRoot.CFrame = humRoot.CFrame + pHum.MoveDirection * Multiplier
         end
         end)
