@@ -1,5 +1,5 @@
 -- Made By RoProExp 
--- Last Updated: 12/1/2024 4:59 PM
+-- Last Updated: 12/14/2024 7:35 PM
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
@@ -51,6 +51,29 @@ local Button = Tab:CreateButton({
     Name = "Shift Lock",
     Callback = function()
         game:GetService('Players').LocalPlayer.DevEnableMouseLock = true
+    end,
+ })
+
+  local Button = Tab:CreateButton({
+    Name = "Perk Values",
+    Callback = function()
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerModel = player.Character or player.CharacterAdded:Wait()
+
+local objectValues = {
+    {Name = "SWEEP HANDS"},
+    {Name = "IMMUNE"},
+    {Name = "HEALTHY_BONES"},
+    {Name = "SKIN_WALKER"},
+    {Name = "NINJA"}
+}
+
+for _, valueInfo in ipairs(objectValues) do
+    local newObjectValue = Instance.new("ObjectValue")
+    newObjectValue.Name = valueInfo.Name
+    newObjectValue.Parent = playerModel
+end
     end,
  })
 
@@ -2642,6 +2665,63 @@ local Button = Tab:CreateButton({
         humRoot.CFrame = humRoot.CFrame + pHum.MoveDirection * Multiplier
         end
         end)
+    end,
+ })
+
+ local Button = Tab:CreateButton({
+    Name = "Perk Values",
+    Callback = function()
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local playerModel = player.Character or player.CharacterAdded:Wait()
+
+local objectValues = {
+    {Name = "SWEEP HANDS"},
+    {Name = "IMMUNE"},
+    {Name = "HEALTHY_BONES"},
+    {Name = "SKIN_WALKER"},
+    {Name = "NINJA"}
+}
+
+for _, valueInfo in ipairs(objectValues) do
+    local newObjectValue = Instance.new("ObjectValue")
+    newObjectValue.Name = valueInfo.Name
+    newObjectValue.Parent = playerModel
+end
+    end,
+ })
+
+local Section = Tab:CreateSection("Heavy (Gives -500 Coins)")
+
+ local Button = Tab:CreateButton({
+    Name = "Custom Radio (Noob Medic)",
+    Callback = function()
+        local args = {
+		[1] = game:GetService("Players").LocalPlayer.PlayerGui.ClassGui.CustomizeClassFrame.HandleClassCus,
+		[2] = "UpdateClassCus",
+		[3] = "Noob",
+		[4] = "Medic",
+		[5] = "Fun Gadget",
+		[6] = "Custom Radio"
+		}
+		game:GetService("ReplicatedStorage").Miscs.Events.ChangeCustomizationEvent:FireServer(unpack(args))
+
+    end,
+ })
+
+ local Button = Tab:CreateButton({
+    Name = "Custom Radio (Zombie Medic)",
+    Callback = function()
+        local args = {
+		[1] = game:GetService("Players").LocalPlayer.PlayerGui.ClassGui.CustomizeClassFrame.HandleClassCus,
+		[2] = "UpdateClassCus",
+		[3] = "Zombie",
+		[4] = "Medic",
+		[5] = "Fun Gadget",
+		[6] = "Custom Radio"
+		}
+		game:GetService("ReplicatedStorage").Miscs.Events.ChangeCustomizationEvent:FireServer(unpack(args))
+
     end,
  })
 
