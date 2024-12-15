@@ -1,5 +1,5 @@
 -- Made By RoProExp 
--- Last Updated: 12/14/2024 7:37 PM
+-- Last Updated: 12/14/2024 8:06 PM
 -- Short Script Version: loadstring(game:HttpGet('https://raw.githubusercontent.com/RoProExp/NVZR-Gui2/refs/heads/main/source'))()
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -63,10 +63,12 @@ local player = Players.LocalPlayer
 local playerModel = player.Character or player.CharacterAdded:Wait()
 
 local objectValues = {
-    {Name = "SWEEP HANDS"},
+   {Name = "SWEEP HANDS"},
     {Name = "IMMUNE"},
     {Name = "HEALTHY_BONES"},
     {Name = "SKIN_WALKER"},
+    {Name = "DAMAGE_BOOST"},
+   {Name = "SCOUT"},
     {Name = "NINJA"}
 }
 
@@ -2681,6 +2683,8 @@ local objectValues = {
     {Name = "IMMUNE"},
     {Name = "HEALTHY_BONES"},
     {Name = "SKIN_WALKER"},
+    {Name = "DAMAGE_BOOST"},
+      {Name = "SCOUT"},
     {Name = "NINJA"}
 }
 
