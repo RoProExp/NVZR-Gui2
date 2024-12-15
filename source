@@ -67,7 +67,6 @@ local objectValues = {
     {Name = "IMMUNE"},
     {Name = "HEALTHY_BONES"},
     {Name = "SKIN_WALKER"},
-    {Name = "DAMAGE_BOOST"},
    {Name = "SCOUT"},
     {Name = "NINJA"}
 }
@@ -2683,7 +2682,6 @@ local objectValues = {
     {Name = "IMMUNE"},
     {Name = "HEALTHY_BONES"},
     {Name = "SKIN_WALKER"},
-    {Name = "DAMAGE_BOOST"},
       {Name = "SCOUT"},
     {Name = "NINJA"}
 }
