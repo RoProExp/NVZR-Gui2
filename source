@@ -1,5 +1,6 @@
 -- Made By RoProExp 
--- Last Updated: 12/14/2024 7:35 PM
+-- Last Updated: 12/14/2024 7:37 PM
+-- Short Script Version: loadstring(game:HttpGet('https://raw.githubusercontent.com/RoProExp/NVZR-Gui2/refs/heads/main/source'))()
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
@@ -2690,8 +2691,6 @@ for _, valueInfo in ipairs(objectValues) do
 end
     end,
  })
-
-local Section = Tab:CreateSection("Heavy (Gives -500 Coins)")
 
  local Button = Tab:CreateButton({
     Name = "Custom Radio (Noob Medic)",
