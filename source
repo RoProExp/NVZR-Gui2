@@ -121,7 +121,32 @@ local Button = Tab:CreateButton({
  local Button = Tab:CreateButton({
     Name = "Infinite Yeid",
     Callback = function()
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+        -- Place this script in a LocalScript within StarterPlayerScripts or StarterCharacterScripts
+
+-- Load Infinite Yield
+loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+
+-- Custom lighting settings
+local Lighting = game:GetService("Lighting")
+
+-- If there's an existing loop, disconnect it
+if brightLoop then
+    brightLoop:Disconnect()
+end
+
+-- Function to update the lighting settings
+local function brightFunc()
+    Lighting.Brightness = 2
+    Lighting.ClockTime = 14
+    Lighting.FogEnd = 100000
+    Lighting.GlobalShadows = false
+    Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+end
+
+-- Create a new loop to call the function periodically
+brightLoop = game:GetService("RunService").RenderStepped:Connect(function()
+    pcall(brightFunc)
+end)
     end,
  })
 
