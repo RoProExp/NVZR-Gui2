@@ -1,5 +1,5 @@
 -- Made By RoProExp 
--- Last Updated: 12/29/2024 4:09 AM
+-- Last Updated: 12/29/2024 4:16 AM
 -- Short Script Version: loadstring(game:HttpGet('https://raw.githubusercontent.com/RoProExp/NVZR-Gui2/refs/heads/main/source'))()
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -90,6 +90,28 @@ end
 brightLoop = game:GetService("RunService").RenderStepped:Connect(function()
     pcall(brightFunc)
 end)
+    end,
+ })
+
+local Button = Tab:CreateButton({
+    Name = "Remove FallDamage",
+    Callback = function()
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local function removeFallDamageEvent()
+    while true do
+        local fallDamageEvent = ReplicatedStorage.Miscs.Events:FindFirstChild("FallDamageEvent")
+        if fallDamageEvent then
+            fallDamageEvent:Destroy()
+            print("FallDamageEvent has been removed.")
+        end
+        wait(1) -- Check every 1 second
+    end
+end
+
+-- Run the function to remove FallDamageEvent
+removeFallDamageEvent()
+
     end,
  })
 
