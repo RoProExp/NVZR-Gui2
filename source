@@ -1,5 +1,5 @@
 -- Made By RoProExp 
--- Last Updated: 12/27/2024 3:27 PM
+-- Last Updated: 12/29/2024 4:09 AM
 -- Short Script Version: loadstring(game:HttpGet('https://raw.githubusercontent.com/RoProExp/NVZR-Gui2/refs/heads/main/source'))()
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
