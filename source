@@ -1,5 +1,5 @@
 -- Made By RoProExp 
--- Last Updated: 12/29/2024 4:16 AM
+-- Last Updated: 1229/2024 7:48 PM
 -- Short Script Version: loadstring(game:HttpGet('https://raw.githubusercontent.com/RoProExp/NVZR-Gui2/refs/heads/main/source'))()
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -8,6 +8,7 @@ local Window = Rayfield:CreateWindow({
     Name = "Noobs vs Zombies Realish Gui 2",
     LoadingTitle = "Noobs vs Zombies Realish Gui 2",
     LoadingSubtitle = "by .sendsomehelp",
+    Theme = "DarkBlue",
    
 
 
@@ -90,6 +91,107 @@ end
 brightLoop = game:GetService("RunService").RenderStepped:Connect(function()
     pcall(brightFunc)
 end)
+    end,
+ })
+
+local Button = Tab:CreateButton({
+    Name = "Mod Notifier",
+    Callback = function()
+       -- List of specific users you want to track
+local specificUsers = {
+"CJKV",
+"bumrushers",
+"Tony4141",
+"LOGIOL",
+"NPCZOMBIE2",
+"whatareallyfunday",
+"TopikzR",
+"Sansek1252",
+"krawder",
+"106hum",
+"4lachlan4",
+"schneegeschoss",
+"AGoshDarnLad",
+"SeedGatherer"
+,}
+
+-- Sound IDs for the notification sounds
+local soundId1 = "rbxassetid://8379374771"
+local soundId2 = "rbxassetid://8379374771"
+
+-- Function to smoothly transition lighting and time of day
+local function transitionLighting(lighting, targetTimeOfDay, targetBrightness, targetOutdoorAmbient, targetAmbient, duration)
+    local initialTimeOfDay = lighting.TimeOfDay
+    local initialBrightness = lighting.Brightness
+    local initialOutdoorAmbient = lighting.OutdoorAmbient
+    local initialAmbient = lighting.Ambient
+    local steps = 30
+    local stepDuration = duration / steps
+
+    for i = 0, steps do
+        local t = i / steps
+        -- Interpolating each attribute
+        lighting.Brightness = t * targetBrightness + (1 - t) * initialBrightness
+        lighting.OutdoorAmbient = initialOutdoorAmbient:Lerp(targetOutdoorAmbient, t)
+        lighting.Ambient = initialAmbient:Lerp(targetAmbient, t)
+        local currentHour = (t * tonumber(targetTimeOfDay:sub(1, 2)) + (1 - t) * tonumber(initialTimeOfDay:sub(1, 2)))
+        lighting.TimeOfDay = string.format("%02d:%s", currentHour, targetTimeOfDay:sub(4))
+        wait(stepDuration)
+    end
+end
+
+-- Function to check if a specific user has joined
+local function onPlayerAdded(player)
+    for _, username in ipairs(specificUsers) do
+        if player.Name == username then
+            print("Specific user " .. username .. " has joined the game!")
+
+            -- Play first notification sound (Loud)
+            local sound1 = Instance.new("Sound")
+            sound1.SoundId = soundId1
+            sound1.Volume = 0.4 -- Louder volume
+            sound1.Parent = game.Workspace
+            sound1:Play()
+
+            -- Smooth flashing of time of day and lighting
+            local lighting = game:GetService("Lighting")
+
+            -- Function to flash time of day and lighting smoothly
+            local function flashLighting()
+                for i = 1, 10 do
+                    transitionLighting(lighting, "14:00:00", 2, Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 255, 255), 0.5) -- Smooth transition to day
+                    transitionLighting(lighting, "00:00:00", 0, Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 0, 0), 0.5) -- Smooth transition to red night
+                end
+            end
+
+            -- Start smooth flashing lighting
+            flashLighting()
+
+            -- When first sound finishes, play second sound (Normal volume)
+            sound1.Ended:Connect(function()
+                local sound2 = Instance.new("Sound")
+                sound2.SoundId = soundId2
+                sound2.Volume = 0.4 -- Normal volume
+                sound2.Parent = game.Workspace
+                sound2:Play()
+
+                -- Optional: Destroy the second sound object after it's played
+                sound2.Ended:Connect(function()
+                    sound2:Destroy()
+                end)
+            end)
+
+            -- Optional: Destroy the first sound object after it's played
+            sound1.Ended:Connect(function()
+                sound1:Destroy()
+            end)
+        end
+    end
+end
+
+-- Connect the function to the PlayerAdded event
+game.Players.PlayerAdded:Connect(onPlayerAdded)
+
     end,
  })
 
@@ -487,107 +589,6 @@ local Button = Tab:CreateButton({
     Name = "Dex",
     Callback = function()
        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
-    end,
- })
-
- local Button = Tab:CreateButton({
-    Name = "Mod Notifier",
-    Callback = function()
-       -- List of specific users you want to track
-local specificUsers = {
-"CJKV",
-"bumrushers",
-"Tony4141",
-"LOGIOL",
-"NPCZOMBIE2",
-"whatareallyfunday",
-"TopikzR",
-"Sansek1252",
-"krawder",
-"106hum",
-"4lachlan4",
-"schneegeschoss",
-"AGoshDarnLad",
-"SeedGatherer"
-,}
-
--- Sound IDs for the notification sounds
-local soundId1 = "rbxassetid://8379374771"
-local soundId2 = "rbxassetid://8379374771"
-
--- Function to smoothly transition lighting and time of day
-local function transitionLighting(lighting, targetTimeOfDay, targetBrightness, targetOutdoorAmbient, targetAmbient, duration)
-    local initialTimeOfDay = lighting.TimeOfDay
-    local initialBrightness = lighting.Brightness
-    local initialOutdoorAmbient = lighting.OutdoorAmbient
-    local initialAmbient = lighting.Ambient
-    local steps = 30
-    local stepDuration = duration / steps
-
-    for i = 0, steps do
-        local t = i / steps
-        -- Interpolating each attribute
-        lighting.Brightness = t * targetBrightness + (1 - t) * initialBrightness
-        lighting.OutdoorAmbient = initialOutdoorAmbient:Lerp(targetOutdoorAmbient, t)
-        lighting.Ambient = initialAmbient:Lerp(targetAmbient, t)
-        local currentHour = (t * tonumber(targetTimeOfDay:sub(1, 2)) + (1 - t) * tonumber(initialTimeOfDay:sub(1, 2)))
-        lighting.TimeOfDay = string.format("%02d:%s", currentHour, targetTimeOfDay:sub(4))
-        wait(stepDuration)
-    end
-end
-
--- Function to check if a specific user has joined
-local function onPlayerAdded(player)
-    for _, username in ipairs(specificUsers) do
-        if player.Name == username then
-            print("Specific user " .. username .. " has joined the game!")
-
-            -- Play first notification sound (Loud)
-            local sound1 = Instance.new("Sound")
-            sound1.SoundId = soundId1
-            sound1.Volume = 0.4 -- Louder volume
-            sound1.Parent = game.Workspace
-            sound1:Play()
-
-            -- Smooth flashing of time of day and lighting
-            local lighting = game:GetService("Lighting")
-
-            -- Function to flash time of day and lighting smoothly
-            local function flashLighting()
-                for i = 1, 10 do
-                    transitionLighting(lighting, "14:00:00", 2, Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 255, 255), 0.5) -- Smooth transition to day
-                    transitionLighting(lighting, "00:00:00", 0, Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 0, 0), 0.5) -- Smooth transition to red night
-                end
-            end
-
-            -- Start smooth flashing lighting
-            flashLighting()
-
-            -- When first sound finishes, play second sound (Normal volume)
-            sound1.Ended:Connect(function()
-                local sound2 = Instance.new("Sound")
-                sound2.SoundId = soundId2
-                sound2.Volume = 0.4 -- Normal volume
-                sound2.Parent = game.Workspace
-                sound2:Play()
-
-                -- Optional: Destroy the second sound object after it's played
-                sound2.Ended:Connect(function()
-                    sound2:Destroy()
-                end)
-            end)
-
-            -- Optional: Destroy the first sound object after it's played
-            sound1.Ended:Connect(function()
-                sound1:Destroy()
-            end)
-        end
-    end
-end
-
--- Connect the function to the PlayerAdded event
-game.Players.PlayerAdded:Connect(onPlayerAdded)
-
     end,
  })
 
