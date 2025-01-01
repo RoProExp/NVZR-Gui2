@@ -1,5 +1,5 @@
 -- Made By RoProExp 
--- Last Updated: 12/31/2024 7:26 PM
+-- Last Updated: 1/1/2025 6:10 PM
 -- Short Script Version: loadstring(game:HttpGet('https://raw.githubusercontent.com/RoProExp/NVZR-Gui2/refs/heads/main/source'))()
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -112,7 +112,9 @@ local specificUsers = {
 "4lachlan4",
 "schneegeschoss",
 "AGoshDarnLad",
-"SeedGatherer"
+"SeedGatherer",
+"EGGHEADLOLD",
+"bloodzillaaa"
 ,}
 
 -- Sound IDs for the notification sounds
