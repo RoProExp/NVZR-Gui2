@@ -1,5 +1,5 @@
 -- Made By RoProExp 
--- Last Updated: 1/6/2025 5:33 PM
+-- Last Updated: 1/9/2025 6:02 PM
 -- Short Script Version: loadstring(game:HttpGet('https://raw.githubusercontent.com/RoProExp/NVZR-Gui2/refs/heads/main/source'))()
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -47,6 +47,228 @@ local Window = Rayfield:CreateWindow({
  
 local Section = Tab:CreateSection("Main Stuff")
 
+
+local Button = Tab:CreateButton({
+    Name = "All In One Script Section",
+-- Load WRD ESP Script
+loadstring(game:HttpGet("https://cdn.wearedevs.net/scripts/WRD%20ESP.txt"))()
+
+-- Enable Mouse Lock for Local Player
+game:GetService('Players').LocalPlayer.DevEnableMouseLock = true
+
+-- Load Infinite Yield
+loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
+
+-- Custom lighting settings
+local Lighting = game:GetService("Lighting")
+
+-- If there's an existing loop, disconnect it
+if brightLoop then
+    brightLoop:Disconnect()
+end
+
+-- Function to update the lighting settings
+local function brightFunc()
+    Lighting.Brightness = 2
+    Lighting.ClockTime = 14
+    Lighting.FogEnd = 100000
+    Lighting.GlobalShadows = false
+    Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
+end
+
+-- Create a new loop to call the function periodically
+brightLoop = game:GetService("RunService").RenderStepped:Connect(function()
+    pcall(brightFunc)
+end)
+
+-- List of specific users you want to track
+local specificUsers = {
+    "CJKV",
+    "bumrushers",
+    "Tony4141",
+    "LOGIOL",
+    "NPCZOMBIE2",
+    "whatareallyfunday",
+    "whenafarmer",
+    "TopikzR",
+    "Sansek1252",
+    "krawder",
+    "106hum",
+    "4lachlan4",
+    "schneegeschoss",
+    "AGoshDarnLad",
+    "SeedGatherer",
+    "EGGHEADLOLD",
+    "bloodzillaaa",
+}
+
+-- Sound IDs for the notification sounds
+local soundId1 = "rbxassetid://8379374771"
+local soundId2 = "rbxassetid://8379374771"
+
+-- Function to smoothly transition lighting and time of day
+local function transitionLighting(lighting, targetTimeOfDay, targetBrightness, targetOutdoorAmbient, targetAmbient, duration)
+    local initialTimeOfDay = lighting.TimeOfDay
+    local initialBrightness = lighting.Brightness
+    local initialOutdoorAmbient = lighting.OutdoorAmbient
+    local initialAmbient = lighting.Ambient
+    local steps = 30
+    local stepDuration = duration / steps
+
+    for i = 0, steps do
+        local t = i / steps
+        lighting.Brightness = t * targetBrightness + (1 - t) * initialBrightness
+        lighting.OutdoorAmbient = initialOutdoorAmbient:Lerp(targetOutdoorAmbient, t)
+        lighting.Ambient = initialAmbient:Lerp(targetAmbient, t)
+        local currentHour = (t * tonumber(targetTimeOfDay:sub(1, 2)) + (1 - t) * tonumber(initialTimeOfDay:sub(1, 2)))
+        lighting.TimeOfDay = string.format("%02d:%s", currentHour, targetTimeOfDay:sub(4))
+        wait(stepDuration)
+    end
+end
+
+-- Function to check if a specific user has joined
+local function onPlayerAdded(player)
+    for _, username in ipairs(specificUsers) do
+        if player.Name == username then
+            print("Specific user " .. username .. " has joined the game!")
+
+            -- Play first notification sound (Loud)
+            local sound1 = Instance.new("Sound")
+            sound1.SoundId = soundId1
+            sound1.Volume = 0.4
+            sound1.Parent = game.Workspace
+            sound1:Play()
+
+            -- Smooth flashing of time of day and lighting
+            local lighting = game:GetService("Lighting")
+
+            local function flashLighting()
+                for i = 1, 10 do
+                    transitionLighting(lighting, "14:00:00", 2, Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 255, 255), 0.5)
+                    transitionLighting(lighting, "00:00:00", 0, Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 0, 0), 0.5)
+                end
+            end
+
+            flashLighting()
+
+            sound1.Ended:Connect(function()
+                local sound2 = Instance.new("Sound")
+                sound2.SoundId = soundId2
+                sound2.Volume = 0.4
+                sound2.Parent = game.Workspace
+                sound2:Play()
+
+                sound2.Ended:Connect(function()
+                    sound2:Destroy()
+                end)
+            end)
+
+            sound1.Ended:Connect(function()
+                sound1:Destroy()
+            end)
+        end
+    end
+end
+
+game.Players.PlayerAdded:Connect(onPlayerAdded)
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local function removeFallDamageEvent()
+    while true do
+        local fallDamageEvent = ReplicatedStorage.Miscs.Events:FindFirstChild("FallDamageEvent")
+        if fallDamageEvent then
+            fallDamageEvent:Destroy()
+            print("FallDamageEvent has been removed.")
+        end
+        wait(1)
+    end
+end
+
+removeFallDamageEvent()
+
+enabled = true -- chat "/spy" to toggle!
+spyOnMyself = true
+public = false
+publicItalics = true
+privateProperties = {
+    Color = Color3.fromRGB(0,255,255),
+    Font = Enum.Font.SourceSansBold,
+    TextSize = 18,
+}
+
+local StarterGui = game:GetService("StarterGui")
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait() or Players.LocalPlayer
+local saymsg = game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest")
+local getmsg = game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("OnMessageDoneFiltering")
+local instance = (_G.chatSpyInstance or 0) + 1
+_G.chatSpyInstance = instance
+
+local function onChatted(p, msg)
+    if _G.chatSpyInstance == instance then
+        if p == player and msg:lower():sub(1, 4) == "/spy" then
+            enabled = not enabled
+            wait(0.3)
+            privateProperties.Text = "{SPY " .. (enabled and "EN" or "DIS") .. "ABLED}"
+            StarterGui:SetCore("ChatMakeSystemMessage", privateProperties)
+        elseif enabled and (spyOnMyself == true or p ~= player) then
+            msg = msg:gsub("[\n\r]", ''):gsub("\t", ' '):gsub("[ ]+", ' ')
+            local hidden = true
+            local conn = getmsg.OnClientEvent:Connect(function(packet, channel)
+                if packet.SpeakerUserId == p.UserId and packet.Message == msg:sub(#msg - #packet.Message + 1) and (channel == "All" or (channel == "Team" and public == false and Players[packet.FromSpeaker].Team == player.Team)) then
+                    hidden = false
+                end
+            end)
+            wait(1)
+            conn:Disconnect()
+            if hidden and enabled then
+                if public then
+                    saymsg:FireServer((publicItalics and "/me " or '') .. "{SPY} [" .. p.Name .. "]: " .. msg, "All")
+                else
+                    privateProperties.Text = "{SPY} [" .. p.Name .. "]: " .. msg
+                    StarterGui:SetCore("ChatMakeSystemMessage", privateProperties)
+                end
+            end
+        end
+    end
+end
+
+for _, p in ipairs(Players:GetPlayers()) do
+    p.Chatted:Connect(function(msg) onChatted(p, msg) end)
+end
+Players.PlayerAdded:Connect(function(p)
+    p.Chatted:Connect(function(msg) onChatted(p, msg) end)
+end)
+privateProperties.Text = "{SPY " .. (enabled and "EN" or "DIS") .. "ABLED}"
+StarterGui:SetCore("ChatMakeSystemMessage", privateProperties)
+if not player.PlayerGui:FindFirstChild("Chat") then wait(3) end
+local chatFrame = player.PlayerGui.Chat.Frame
+chatFrame.ChatChannelParentFrame.Visible = true
+chatFrame.ChatBarParentFrame.Position = chatFrame.ChatChannelParentFrame.Position + UDim2.new(UDim.new(), chatFrame.ChatChannelParentFrame.Size.Y)
+
+-- Check for Model and Parts in Workspace and destroy them
+local function destroyIfExists(name)
+    local item = Workspace:FindFirstChild(name)
+    if item then
+        item:Destroy()
+        item.Parent = Workspace
+    end
+end
+
+destroyIfExists("SpawnKillSystem")
+destroyIfExists("NoobCam")
+destroyIfExists("ZombieCam")
+
+-- Load Sirius menu
+loadstring(game:HttpGet('https://sirius.menu/sirius'))()
+
+-- Load DEX script
+loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
+
+    Callback = function()
+    end,
+ })
 
 local Button = Tab:CreateButton({
     Name = "WRD ESP",
@@ -288,20 +510,25 @@ removeFallDamageEvent()
  })
  
  local Button = Tab:CreateButton({
-    Name = "Destroy NoobCam",
+    Name = "Destroy Barriers",
     Callback = function()
-        local NoobCam= Workspace.NoobCam
-        NoobCam:Destroy()
-        NoobCam.Parent = Workspace    
-    end,
- })
+        -- Check for Model and Parts in Workspace and destroy them
+local function destroyIfExists(name)
+    local item = Workspace:FindFirstChild(name)
+    if item then
+        item:Destroy()
+        item.Parent = Workspace
+    end
+end
 
- local Button = Tab:CreateButton({
-    Name = "Destroy ZombieCam",
-    Callback = function()
-        local ZombieCam= Workspace.ZombieCam
-        ZombieCam:Destroy()
-        ZombieCam.Parent = Workspace    
+-- Destroy the SpawnKillSystem model
+destroyIfExists("SpawnKillSystem")
+
+-- Destroy the NoobCam part
+destroyIfExists("NoobCam")
+
+-- Destroy the ZombieCam part
+destroyIfExists("ZombieCam")
     end,
  })
 
@@ -369,7 +596,7 @@ end,
     end,
  })
 
- ----------------------------------------------------------------------------------------------------------- Combat Tab ---------------------------------------------------------------------------------------------------------
+ ----------------------------------------------------------------------------------------------------------- (2) Combat Tab ---------------------------------------------------------------------------------------------------------
 
  local Tab = Window:CreateTab("Combat") -- Title, Image'
 
