@@ -1,5 +1,5 @@
 -- Made By RoProExp 
--- Last Updated: 1/9/2025 6:10 PM
+-- Last Updated: 1/9/2025 6:12 PM
 -- Short Script Version: loadstring(game:HttpGet('https://raw.githubusercontent.com/RoProExp/NVZR-Gui2/refs/heads/main/source'))()
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -313,7 +313,7 @@ destroyIfExists("ZombieCam")
  local Button = Tab:CreateButton({
     Name = "Sirius Menu",
     Callback = function()
-        game:GetService('Players').LocalPlayer.DevEnableMouseLock = true
+        loadstring(game:HttpGet('https://sirius.menu/sirius'))()
     end,
  })
 
