@@ -1,5 +1,5 @@
 -- Made By RoProExp 
--- Last Updated: 1/9/2025 6:12 PM
+-- Last Updated: 7/13/2025 3:42 AM
 -- Short Script Version: loadstring(game:HttpGet('https://raw.githubusercontent.com/RoProExp/NVZR-Gui2/refs/heads/main/source'))()
 
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
@@ -96,51 +96,16 @@ end)
 local Button = Tab:CreateButton({
     Name = "Mod Notifier",
     Callback = function()
-       -- List of specific users you want to track
+-- List of specific users you want to track
 local specificUsers = {
-"CJKV",
-"bumrushers",
-"Tony4141",
-"LOGIOL",
-"NPCZOMBIE2",
-"whatareallyfunday",
-"whenafarmer",
-"TopikzR",
-"Sansek1252",
-"krawder",
-"106hum",
-"4lachlan4",
-"schneegeschoss",
-"AGoshDarnLad",
-"SeedGatherer",
-"EGGHEADLOLD",
-"bloodzillaaa"
-,}
+    "CJKV", "bumrushers", "Tony4141", "LOGIOL", "NPCZOMBIE2", "whatareallyfunday",
+    "whenafarmer", "TopikzR", "Sansek1252", "krawder", "106hum", "4lachlan4",
+    "schneegeschoss", "AGoshDarnLad", "SeedGatherer", "EGGHEADLOLD", "bloodzillaaa"
+}
 
 -- Sound IDs for the notification sounds
 local soundId1 = "rbxassetid://8379374771"
 local soundId2 = "rbxassetid://8379374771"
-
--- Function to smoothly transition lighting and time of day
-local function transitionLighting(lighting, targetTimeOfDay, targetBrightness, targetOutdoorAmbient, targetAmbient, duration)
-    local initialTimeOfDay = lighting.TimeOfDay
-    local initialBrightness = lighting.Brightness
-    local initialOutdoorAmbient = lighting.OutdoorAmbient
-    local initialAmbient = lighting.Ambient
-    local steps = 30
-    local stepDuration = duration / steps
-
-    for i = 0, steps do
-        local t = i / steps
-        -- Interpolating each attribute
-        lighting.Brightness = t * targetBrightness + (1 - t) * initialBrightness
-        lighting.OutdoorAmbient = initialOutdoorAmbient:Lerp(targetOutdoorAmbient, t)
-        lighting.Ambient = initialAmbient:Lerp(targetAmbient, t)
-        local currentHour = (t * tonumber(targetTimeOfDay:sub(1, 2)) + (1 - t) * tonumber(initialTimeOfDay:sub(1, 2)))
-        lighting.TimeOfDay = string.format("%02d:%s", currentHour, targetTimeOfDay:sub(4))
-        wait(stepDuration)
-    end
-end
 
 -- Function to check if a specific user has joined
 local function onPlayerAdded(player)
@@ -148,42 +113,43 @@ local function onPlayerAdded(player)
         if player.Name == username then
             print("Specific user " .. username .. " has joined the game!")
 
-            -- Play first notification sound (Loud)
+            -- Play first notification sound
             local sound1 = Instance.new("Sound")
             sound1.SoundId = soundId1
-            sound1.Volume = 0.4 -- Louder volume
+            sound1.Volume = 0.4
             sound1.Parent = game.Workspace
             sound1:Play()
 
-            -- Smooth flashing of time of day and lighting
             local lighting = game:GetService("Lighting")
 
-            -- Function to flash time of day and lighting smoothly
-            local function flashLighting()
-                for i = 1, 10 do
-                    transitionLighting(lighting, "14:00:00", 2, Color3.fromRGB(255, 255, 255), Color3.fromRGB(255, 255, 255), 0.5) -- Smooth transition to day
-                    transitionLighting(lighting, "00:00:00", 0, Color3.fromRGB(255, 0, 0), Color3.fromRGB(255, 0, 0), 0.5) -- Smooth transition to red night
+            -- Buzzer-style flash: white/black every 20ms, total duration 0.7s
+            local function buzzerFlash()
+                local flashes = math.floor(0.7 / 0.02) -- = 35 flashes (≈17 full cycles)
+                for i = 1, flashes do
+                    local isEven = i % 2 == 0
+                    lighting.Brightness = isEven and 2 or 0
+                    local color = isEven and Color3.new(1,1,1) or Color3.new(0,0,0)
+                    lighting.OutdoorAmbient = color
+                    lighting.Ambient = color
+                    lighting.TimeOfDay = isEven and "12:00:00" or "00:00:00"
+                    wait(0.02) -- 20 milliseconds
                 end
             end
 
-            -- Start smooth flashing lighting
-            flashLighting()
+            buzzerFlash()
 
-            -- When first sound finishes, play second sound (Normal volume)
+            -- Play second sound after first finishes
             sound1.Ended:Connect(function()
                 local sound2 = Instance.new("Sound")
                 sound2.SoundId = soundId2
-                sound2.Volume = 0.4 -- Normal volume
+                sound2.Volume = 0.4
                 sound2.Parent = game.Workspace
                 sound2:Play()
-
-                -- Optional: Destroy the second sound object after it's played
                 sound2.Ended:Connect(function()
                     sound2:Destroy()
                 end)
             end)
 
-            -- Optional: Destroy the first sound object after it's played
             sound1.Ended:Connect(function()
                 sound1:Destroy()
             end)
@@ -192,8 +158,7 @@ local function onPlayerAdded(player)
 end
 
 -- Connect the function to the PlayerAdded event
-game.Players.PlayerAdded:Connect(onPlayerAdded)
-
+game.Players.PlayerAdded:Connect(onPlayerAdded) 
     end,
  })
 
@@ -219,72 +184,7 @@ removeFallDamageEvent()
     end,
  })
 
- local Button = Tab:CreateButton({
-    Name = "Spy Chat",
-    Callback = function()
-        enabled = true --chat "/spy" to toggle!
-        spyOnMyself = true --if true will check your messages too
-        public = false --if true will chat the logs publicly (fun, risky)
-        publicItalics = true --if true will use /me to stand out
-        privateProperties = { --customize private logs
-            Color = Color3.fromRGB(0,255,255); 
-            Font = Enum.Font.SourceSansBold;
-            TextSize = 18;
-        }
-    
-    
-        local StarterGui = game:GetService("StarterGui")
-        local Players = game:GetService("Players")
-        local player = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait() or Players.LocalPlayer
-        local saymsg = game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest")
-        local getmsg = game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("OnMessageDoneFiltering")
-        local instance = (_G.chatSpyInstance or 0) + 1
-        _G.chatSpyInstance = instance
-    
-        local function onChatted(p,msg)
-            if _G.chatSpyInstance == instance then
-                if p==player and msg:lower():sub(1,4)=="/spy" then
-                    enabled = not enabled
-                    wait(0.3)
-                    privateProperties.Text = "{SPY "..(enabled and "EN" or "DIS").."ABLED}"
-                    StarterGui:SetCore("ChatMakeSystemMessage",privateProperties)
-                elseif enabled and (spyOnMyself==true or p~=player) then
-                    msg = msg:gsub("[\n\r]",''):gsub("\t",' '):gsub("[ ]+",' ')
-                    local hidden = true
-                    local conn = getmsg.OnClientEvent:Connect(function(packet,channel)
-                        if packet.SpeakerUserId==p.UserId and packet.Message==msg:sub(#msg-#packet.Message+1) and (channel=="All" or (channel=="Team" and public==false and Players[packet.FromSpeaker].Team==player.Team)) then
-                            hidden = false
-                        end
-                    end)
-                    wait(1)
-                    conn:Disconnect()
-                    if hidden and enabled then
-                        if public then
-                            saymsg:FireServer((publicItalics and "/me " or '').."{SPY} [".. p.Name .."]: "..msg,"All")
-                        else
-                            privateProperties.Text = "{SPY} [".. p.Name .."]: "..msg
-                            StarterGui:SetCore("ChatMakeSystemMessage",privateProperties)
-                        end
-                    end
-                end
-            end
-        end
-    
-        for _,p in ipairs(Players:GetPlayers()) do
-            p.Chatted:Connect(function(msg) onChatted(p,msg) end)
-        end
-        Players.PlayerAdded:Connect(function(p)
-            p.Chatted:Connect(function(msg) onChatted(p,msg) end)
-        end)
-        privateProperties.Text = "{SPY "..(enabled and "EN" or "DIS").."ABLED}"
-        StarterGui:SetCore("ChatMakeSystemMessage",privateProperties)
-        if not player.PlayerGui:FindFirstChild("Chat") then wait(3) end
-        local chatFrame = player.PlayerGui.Chat.Frame
-        chatFrame.ChatChannelParentFrame.Visible = true
-        chatFrame.ChatBarParentFrame.Position = chatFrame.ChatChannelParentFrame.Position+UDim2.new(UDim.new(),chatFrame.ChatChannelParentFrame.Size.Y)
-    
-    end,
- })
+ 
  
  local Button = Tab:CreateButton({
     Name = "Destroy Barriers",
@@ -548,6 +448,47 @@ local Button = Tab:CreateButton({
         end)
     end,
  })
+ local Button = Tab:CreateButton({
+    Name = "Support Stealer",
+    Callback = function()
+while true do
+    local localPlayer = game:GetService("Players").LocalPlayer
+    local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+
+    local toolNames = {"Airstrike Radio", "Napalm Radio", "Gas Strike Radio", "Phantom Radio", "Gunship Laptop", "Nuclear Bomb Radio", "Sentry Wrench", "Helicopter Radio"} -- Add more tool names here if needed
+
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player ~= localPlayer then
+            local enemyBackpack = player:FindFirstChild("Backpack")
+
+            if enemyBackpack then
+                for _, toolName in ipairs(toolNames) do
+                    local foundTool = enemyBackpack:FindFirstChild(toolName)
+                    if foundTool then
+                        print("(DEBUG!) Found " .. toolName .. " in " .. player.Name .. "'s backpack")
+
+                        -- Move tool to local player
+                        foundTool.Parent = localPlayer.Backpack
+
+                        -- Wait for it to appear in your backpack
+                        local myTool = localPlayer.Backpack:FindFirstChild(toolName)
+                        if myTool then
+                            -- Equip instantly
+                            humanoid:EquipTool(myTool)
+                            print("(DEBUG!) Equipped " .. toolName)
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    task.wait(0.2)
+end
+
+end,
+})
 
  local Button = Tab:CreateButton({
     Name = "Barb Wire",
@@ -649,77 +590,6 @@ local Button = Tab:CreateButton({
        loadstring(game:HttpGet("https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"))()
     end,
  })
-
-
-
- local Button = Tab:CreateButton({
-    Name = "Spy Chat",
-    Callback = function()
-        enabled = true --chat "/spy" to toggle!
-        spyOnMyself = true --if true will check your messages too
-        public = false --if true will chat the logs publicly (fun, risky)
-        publicItalics = true --if true will use /me to stand out
-        privateProperties = { --customize private logs
-            Color = Color3.fromRGB(0,255,255); 
-            Font = Enum.Font.SourceSansBold;
-            TextSize = 18;
-        }
-    
-    
-        local StarterGui = game:GetService("StarterGui")
-        local Players = game:GetService("Players")
-        local player = Players.LocalPlayer or Players:GetPropertyChangedSignal("LocalPlayer"):Wait() or Players.LocalPlayer
-        local saymsg = game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest")
-        local getmsg = game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("OnMessageDoneFiltering")
-        local instance = (_G.chatSpyInstance or 0) + 1
-        _G.chatSpyInstance = instance
-    
-        local function onChatted(p,msg)
-            if _G.chatSpyInstance == instance then
-                if p==player and msg:lower():sub(1,4)=="/spy" then
-                    enabled = not enabled
-                    wait(0.3)
-                    privateProperties.Text = "{SPY "..(enabled and "EN" or "DIS").."ABLED}"
-                    StarterGui:SetCore("ChatMakeSystemMessage",privateProperties)
-                elseif enabled and (spyOnMyself==true or p~=player) then
-                    msg = msg:gsub("[\n\r]",''):gsub("\t",' '):gsub("[ ]+",' ')
-                    local hidden = true
-                    local conn = getmsg.OnClientEvent:Connect(function(packet,channel)
-                        if packet.SpeakerUserId==p.UserId and packet.Message==msg:sub(#msg-#packet.Message+1) and (channel=="All" or (channel=="Team" and public==false and Players[packet.FromSpeaker].Team==player.Team)) then
-                            hidden = false
-                        end
-                    end)
-                    wait(1)
-                    conn:Disconnect()
-                    if hidden and enabled then
-                        if public then
-                            saymsg:FireServer((publicItalics and "/me " or '').."{SPY} [".. p.Name .."]: "..msg,"All")
-                        else
-                            privateProperties.Text = "{SPY} [".. p.Name .."]: "..msg
-                            StarterGui:SetCore("ChatMakeSystemMessage",privateProperties)
-                        end
-                    end
-                end
-            end
-        end
-    
-        for _,p in ipairs(Players:GetPlayers()) do
-            p.Chatted:Connect(function(msg) onChatted(p,msg) end)
-        end
-        Players.PlayerAdded:Connect(function(p)
-            p.Chatted:Connect(function(msg) onChatted(p,msg) end)
-        end)
-        privateProperties.Text = "{SPY "..(enabled and "EN" or "DIS").."ABLED}"
-        StarterGui:SetCore("ChatMakeSystemMessage",privateProperties)
-        if not player.PlayerGui:FindFirstChild("Chat") then wait(3) end
-        local chatFrame = player.PlayerGui.Chat.Frame
-        chatFrame.ChatChannelParentFrame.Visible = true
-        chatFrame.ChatBarParentFrame.Position = chatFrame.ChatChannelParentFrame.Position+UDim2.new(UDim.new(),chatFrame.ChatChannelParentFrame.Size.Y)
-    
-    end,
- })
- 
-
  
  local Button = Tab:CreateButton({
     Name = "Lives Drainer",
@@ -764,869 +634,6 @@ local Button = Tab:CreateButton({
     end,
  })
 
- local Button = Tab:CreateButton({
-    Name = "NVZR Gui (Old)",
-    Callback = function()
-        loadstring(game:HttpGet("https://pastebin.com/raw/UPKrsamZ", true))()
-    end,
- })
-
-
- local Button = Tab:CreateButton({
-    Name = "simple Hub (Private's Version)",
-    Callback = function()
-   -- Obfuscated with MoonSec
-local OrionLib = loadstring(game:HttpGet(('https://raw.githubusercontent.com/shlexware/Orion/main/source')))()
-local Window = OrionLib:MakeWindow({Name = "simple Hub", HidePremium = false, SaveConfig = true, ConfigFolder = "OrionTest", IntroEnabled = true, IntroText = "Loading simple hub for Noobs vs Zombies Realish.."})
-OrionLib:MakeNotification({
-	Name = "Security",
-	Content = "Whitelisted! ✅",
-	Image = "https://www.malwarebytes.com/images/pillar-page/icon-shield.svg",
-	Time = 15
-})
--- GAMEPASSES TAB
-local GamepassesTab = Window:MakeTab({
-	Name = "Gamepasses",
-	Icon = "nil",
-	PremiumOnly = false
-})
-local Section = GamepassesTab:AddSection({
-	Name = "Free Injector"
-})
-GamepassesTab:AddButton({
-	Name = "Injector - Zombies",
-	Callback = function()
-		local args = {
-		[1] = game:GetService("Players").LocalPlayer.PlayerGui.ClassGui.CustomizeClassFrame.HandleClassCus,
-		[2] = "UpdateClassCus",
-		[3] = "Zombie",
-		[4] = "Medic",
-		[5] = "Gadget1",
-		[6] = "Injector"
-		}
-		game:GetService("ReplicatedStorage").Miscs.Events.ChangeCustomizationEvent:FireServer(unpack(args))
-      		print("button pressed")
-  	end    
-})
-GamepassesTab:AddButton({
-	Name = "Injector - Noobs",
-	Callback = function()
-		local args = {
-		[1] = game:GetService("Players").LocalPlayer.PlayerGui.ClassGui.CustomizeClassFrame.HandleClassCus,
-		[2] = "UpdateClassCus",
-		[3] = "Noob",
-		[4] = "Medic",
-		[5] = "Gadget1",
-		[6] = "Injector"
-		}
-		game:GetService("ReplicatedStorage").Miscs.Events.ChangeCustomizationEvent:FireServer(unpack(args))
-      		print("button pressed")
-  	end    
-})
-local Section = GamepassesTab:AddSection({
-	Name = "Free Custom Radio"
-})
-GamepassesTab:AddButton({
-	Name = "Custom Radio - Zombies",
-	Callback = function()
-		local args = {
-		[1] = game:GetService("Players").LocalPlayer.PlayerGui.ClassGui.CustomizeClassFrame.HandleClassCus,
-		[2] = "UpdateClassCus",
-		[3] = "Zombie",
-		[4] = "Medic",
-		[5] = "Fun Gadget",
-		[6] = "Custom Radio"
-		}
-			game:GetService("ReplicatedStorage").Miscs.Events.ChangeCustomizationEvent:FireServer(unpack(args))
-      		print("button pressed")
-  	end    
-})
-GamepassesTab:AddButton({
-	Name = "Custom Radio - Noobs",
-	Callback = function()
-		local args = {
-		[1] = game:GetService("Players").LocalPlayer.PlayerGui.ClassGui.CustomizeClassFrame.HandleClassCus,
-		[2] = "UpdateClassCus",
-		[3] = "Noob",
-		[4] = "Medic",
-		[5] = "Fun Gadget",
-		[6] = "Custom Radio"
-		}
-			game:GetService("ReplicatedStorage").Miscs.Events.ChangeCustomizationEvent:FireServer(unpack(args))
-      		print("button pressed")
-  	end    
-})
-local Section = GamepassesTab:AddSection({
-	Name = "Free Radio"
-})
-GamepassesTab:AddButton({
-	Name = "Radio - Zombies",
-	Callback = function()
-		local args = {
-			[1] = game:GetService("Players").LocalPlayer.PlayerGui.ClassGui.CustomizeClassFrame.HandleClassCus,
-			[2] = "UpdateClassCus",
-			[3] = "Zombie",
-			[4] = "Medic",
-			[5] = "Fun Gadget",
-			[6] = "Radio"
-			}
-		game:GetService("ReplicatedStorage").Miscs.Events.ChangeCustomizationEvent:FireServer(unpack(args))
-      		print("button pressed")
-  	end    
-})
-GamepassesTab:AddButton({
-	Name = "Radio - Noobs",
-	Callback = function()
-		local args = {
-			[1] = game:GetService("Players").LocalPlayer.PlayerGui.ClassGui.CustomizeClassFrame.HandleClassCus,
-			[2] = "UpdateClassCus",
-			[3] = "Noob",
-			[4] = "Medic",
-			[5] = "Fun Gadget",
-			[6] = "Radio"
-			}
-		game:GetService("ReplicatedStorage").Miscs.Events.ChangeCustomizationEvent:FireServer(unpack(args))
-      		print("button pressed")
-  	end    
-})
-local Section = GamepassesTab:AddSection({
-	Name = "Free Pyro Addict"
-})
-GamepassesTab:AddButton({
-	Name = "Pyro Addict - Zombies",
-	Callback = function()
-		local args = {
-		[1] = game:GetService("Players").LocalPlayer.PlayerGui.ClassGui.CustomizeClassFrame.HandleClassCus,
-		[2] = "UpdateClassCus",
-		[3] = "Zombie",
-		[4] = "Hero",
-		[5] = "Hero",
-		[6] = "Pyro Addict"
-		}
-		game:GetService("ReplicatedStorage").Miscs.Events.ChangeCustomizationEvent:FireServer(unpack(args))
-      		print("button pressed")
-  	end    
-})
-GamepassesTab:AddButton({
-	Name = "Pyro Addict - Noobs",
-	Callback = function()
-		local args = {
-		[1] = game:GetService("Players").LocalPlayer.PlayerGui.ClassGui.CustomizeClassFrame.HandleClassCus,
-		[2] = "UpdateClassCus",
-		[3] = "Noob",
-		[4] = "Hero",
-		[5] = "Hero",
-		[6] = "Pyro Addict"
-		}
-		game:GetService("ReplicatedStorage").Miscs.Events.ChangeCustomizationEvent:FireServer(unpack(args))
-      		print("button pressed")
-  	end    
-})
-local Section = GamepassesTab:AddSection({
-	Name = "Free Raig Set"
-})
-GamepassesTab:AddButton({
-	Name = "Raig Set - Zombies",
-	Callback = function()
-		local args = {
-		[1] = game:GetService("Players").LocalPlayer.PlayerGui.ClassGui.CustomizeClassFrame.HandleClassCus,
-		[2] = "UpdateClassCus",
-		[3] = "Zombie",
-		[4] = "Supplier",
-		[5] = "Grenade",
-		[6] = "Raig Grenade"
-		}
-		game:GetService("ReplicatedStorage").Miscs.Events.ChangeCustomizationEvent:FireServer(unpack(args))
-      		print("button pressed")
-  	end    
-})
-GamepassesTab:AddButton({
-	Name = "Raig Set - Noobs",
-	Callback = function()
-		local args = {
-		[1] = game:GetService("Players").LocalPlayer.PlayerGui.ClassGui.CustomizeClassFrame.HandleClassCus,
-		[2] = "UpdateClassCus",
-		[3] = "Noob",
-		[4] = "Supplier",
-		[5] = "Grenade",
-		[6] = "Raig Grenade"
-		}
-		game:GetService("ReplicatedStorage").Miscs.Events.ChangeCustomizationEvent:FireServer(unpack(args))
-      		print("button pressed")
-  	end    
-})
--- COMBAT TAB
-local CombatTab = Window:MakeTab({
-	Name = "Combat",
-	Icon = "nil",
-	PremiumOnly = false
-})
-local Section = CombatTab:AddSection({
-	Name = "Movement"
-})
-CombatTab:AddButton({
-	Name = "Undetected Inf Jump - Hold Space",
-	Callback = function()
-        local infjump = true
-        game:GetService("UserInputService").JumpRequest:connect(function()
-        if infjump then
-        game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
-        end
-        end)
-      		print("button pressed")
-  	end    
-})
-CombatTab:AddButton({
-	Name = "Undetected Walkspeed - LeftShift",
-	Callback = function()
-        local Players = game:service("Players")
-        local Player = Players.LocalPlayer
-        local userInput = game:service("UserInputService")
-        local runService = game:service("RunService")
-        repeat wait() until Player.Character
-        local Character = Player.Character
-        local pHum = Character:WaitForChild("Humanoid")
-        local humRoot = Character:WaitForChild("HumanoidRootPart")
-        local Multiplier = 2 -- adjust this for more or less speed
-        userInput.InputBegan:connect(function(Key)
-        if Key.KeyCode == Enum.KeyCode.LeftBracket then
-        Multiplier = Multiplier + 0.1
-        wait(0.2)
-        while userInput:IsKeyDown(Enum.KeyCode.LeftBracket) do
-        wait()
-        Multiplier = Multiplier + 0.1
-        end
-        end
-        if Key.KeyCode == Enum.KeyCode.RightBracket then
-        Multiplier = Multiplier - 0.1
-        wait(0.2)
-        while userInput:IsKeyDown(Enum.KeyCode.RightBracket) do
-        wait()
-        Multiplier = Multiplier - 0.1
-        end
-        end
-        end)
-        runService.Stepped:connect(function()
-        if userInput:IsKeyDown(Enum.KeyCode.LeftShift) then
-        humRoot.CFrame = humRoot.CFrame + pHum.MoveDirection * Multiplier
-        end
-        end)
-      		print("button pressed")
-  	end    
-})
-CombatTab:AddButton({
-	Name = "Deploy Heavy",
-	Callback = function()
-		function getNil(name,class) for _,v in next, getnilinstances() do if v.ClassName==class and v.Name==name then return v;end end end
-		local args = {
-		[1] = getNil("HandleClass", "LocalScript"),
-		[2] = "Heavy",
-		[3] = "CharacterSlot1",
-		[4] = "Lobby Mask"
-		}
-		game:GetService("ReplicatedStorage"):WaitForChild("Miscs"):WaitForChild("Events"):WaitForChild("DeployPlayerToBattleEvent"):InvokeServer(unpack(args))
-      		print("button pressed")
-  	end    
-})
-CombatTab:AddButton({
-	Name = "Contributor Mask",
-	Callback = function()
-		function getNil(name,class) for _,v in next, getnilinstances() do if v.ClassName==class and v.Name==name then return v;end end end
-		local args = {
-		[1] = getNil("HandleClass", "LocalScript"),
-		[2] = "Supplier",
-		[3] = "CharacterSlot1",
-		[4] = "Lobby Mask"
-		}
-		game:GetService("ReplicatedStorage"):WaitForChild("Miscs"):WaitForChild("Events"):WaitForChild("DeployPlayerToBattleEvent"):InvokeServer(unpack(args))
-      		print("button pressed")
-  	end    
-})
-CombatTab:AddButton({
-	Name = "Veteran Perk",
-	Callback = function()
-		while true do
-			for i,rr in pairs(game.Players:GetPlayers()) do
-			if rr.name ~= game:GetService("Players").LocalPlayer.Name then
-			local stuff = {game:GetService("Players"):FindFirstChild(rr.Name).Backpack:FindFirstChild("Activasional Menu")}
-			if stuff[0] or stuff[1] then
-			print("(DEBUG!) found something")
-			keypress(120)
-			keyrelease(120)
-			table.foreach(stuff, function(i,v)
-			v.Parent = game:GetService("Players").LocalPlayer.Backpack
-			end)
-			end
-			end
-			end
-			task.wait(5)
-			end
-      		print("button pressed")
-  	end    
-})
-CombatTab:AddButton({
-	Name = "Hitbox Expander",
-	Callback = function()
-        _G.HeadSize = 25
-        _G.Disabled = true
-        game:GetService('RunService').RenderStepped:connect(function()
-        if _G.Disabled then
-        for i,v in next, game:GetService('Players'):GetPlayers() do
-        if v.Name ~= game:GetService('Players').LocalPlayer.Name then
-        pcall(function()
-        v.Character.HumanoidRootPart.Size = Vector3.new(_G.HeadSize,_G.HeadSize,_G.HeadSize)
-        v.Character.HumanoidRootPart.Transparency = 0.75
-        v.Character.HumanoidRootPart.BrickColor = BrickColor.new("Really black")
-        v.Character.HumanoidRootPart.Material = "Neon"
-        v.Character.HumanoidRootPart.CanCollide = false
-        end)
-        end
-        end
-        end
-        end)
-      		print("button pressed")
-  	end    
-})
-CombatTab:AddButton({
-	Name = "Sword Reach",
-	Callback = function()
-        _G.HeadSize = 35
-        _G.Disabled = true
-        game:GetService('RunService').RenderStepped:connect(function()
-        if _G.Disabled then
-        for i,v in next, game:GetService('Players'):GetPlayers() do
-        if v.Name ~= game:GetService('Players').LocalPlayer.Name then
-        pcall(function()
-        v.Character.HumanoidRootPart.Size = Vector3.new(_G.HeadSize,_G.HeadSize,_G.HeadSize)
-        v.Character.HumanoidRootPart.Transparency = 1
-        v.Character.HumanoidRootPart.BrickColor = BrickColor.new("Really black")
-        v.Character.HumanoidRootPart.Material = "Neon"
-        v.Character.HumanoidRootPart.CanCollide = false
-        end)
-        end
-        end
-        end
-        end)
-      		print("button pressed")
-  	end    
-})
-CombatTab:AddButton({
-	Name = "Remove Spawngates",
-	Callback = function()
-		local SpawnKillSystem = Workspace.SpawnKillSystem
-		SpawnKillSystem:Destroy()
-		SpawnKillSystem.Parent = Workspace
-      		print("button pressed")
-  	end    
-})
-CombatTab:AddButton({
-	Name = "Legit Aimlock - MouseButton2",
-	Callback = function()
---FE Simple AimLock Script | Released Nov 2021 | Working.
-local Area = game:GetService("Workspace")
-local RunService = game:GetService("RunService")
-local UIS = game:GetService("UserInputService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local MyCharacter = LocalPlayer.Character
-local MyRoot = MyCharacter:FindFirstChild("HumanoidRootPart")
-local MyHumanoid = MyCharacter:FindFirstChild("Humanoid")
-local Mouse = LocalPlayer:GetMouse()
-local MyView = Area.CurrentCamera
-local MyTeamColor = LocalPlayer.TeamColor
-local HoldingM2 = false
-local Active = false
-local Lock = false
-local Epitaph = .187 ---Note: The Bigger The Number, The More Prediction.
-local HeadOffset = Vector3.new(0, .1, 0)
-
-_G.TeamCheck = false
-_G.AimPart = "HumanoidRootPart"
-_G.Sensitivity = 0
-_G.CircleSides = 64
-_G.CircleColor = Color3.fromRGB(255, 0, 130)
-_G.CircleTransparency = 0
-_G.CircleRadius = 200
-_G.CircleFilled = false
-_G.CircleVisible = true
-_G.CircleThickness = 1
-
-local FOVCircle = Drawing.new("Circle")
-FOVCircle.Position = Vector2.new(MyView.ViewportSize.X / 2, MyView.ViewportSize.Y / 2)
-FOVCircle.Radius = _G.CircleRadius
-FOVCircle.Filled = _G.CircleFilled
-FOVCircle.Color = _G.CircleColor
-FOVCircle.Visible = _G.CircleVisible
-FOVCircle.Transparency = _G.CircleTransparency
-FOVCircle.NumSides = _G.CircleSides
-FOVCircle.Thickness = _G.CircleThickness
-
-local function CursorLock()
-	UIS.MouseBehavior = Enum.MouseBehavior.LockCenter
-end
-local function UnLockCursor()
-	HoldingM2 = false Active = false Lock = false 
-	UIS.MouseBehavior = Enum.MouseBehavior.Default
-end
-function FindNearestPlayer()
-	local dist = math.huge
-	local Target = nil
-	for _, v in pairs(Players:GetPlayers()) do
-		if v ~= LocalPlayer and v.Character:FindFirstChild("Humanoid") and v.Character:FindFirstChild("Humanoid").Health > 0 and v.Character:FindFirstChild("HumanoidRootPart") and v then
-			local TheirCharacter = v.Character
-			local CharacterRoot, Visible = MyView:WorldToViewportPoint(TheirCharacter[_G.AimPart].Position)
-			if Visible then
-				local RealMag = (Vector2.new(Mouse.X, Mouse.Y) - Vector2.new(CharacterRoot.X, CharacterRoot.Y)).Magnitude
-				if RealMag < dist and RealMag < FOVCircle.Radius then
-					dist = RealMag
-					Target = TheirCharacter
-				end
-			end
-		end
-	end
-	return Target
-end
-
-UIS.InputBegan:Connect(function(Input)
-	if Input.UserInputType == Enum.UserInputType.MouseButton2 then
-		HoldingM2 = true
-		Active = true
-		Lock = true
-		if Active then
-        	local The_Enemy = FindNearestPlayer()
-			while HoldingM2 do task.wait(.000001)
-				if Lock and The_Enemy ~= nil then
-					local Future = The_Enemy.HumanoidRootPart.CFrame + (The_Enemy.HumanoidRootPart.Velocity * Epitaph + HeadOffset)
-					MyView.CFrame = CFrame.lookAt(MyView.CFrame.Position, Future.Position)
-					CursorLock()
-				end
-			end
-		end
-	end
-end)
-UIS.InputEnded:Connect(function(Input)
-	if Input.UserInputType == Enum.UserInputType.MouseButton2 then
-		UnLockCursor()
-	end
-end)
-      		print("button pressed")
-  	end    
-})
-CombatTab:AddButton({
-	Name = "Chams ESP",
-	Callback = function()
-		function CreateSG(name,parent,face)
-			local SurfaceGui = Instance.new("SurfaceGui",parent)
-			SurfaceGui.Parent = parent
-			SurfaceGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-			SurfaceGui.Face = Enum.NormalId[face]
-			SurfaceGui.LightInfluence = 0
-			SurfaceGui.ResetOnSpawn = false
-			SurfaceGui.Name = name
-			SurfaceGui.AlwaysOnTop = true
-			local Frame = Instance.new("Frame",SurfaceGui)
-			Frame.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
-			Frame.Size = UDim2.new(1,0,1,0)
-		end
-		
-		while wait(1) do
-		for i,v in pairs (game:GetService("Players"):GetPlayers()) do
-			if v ~= game:GetService("Players").LocalPlayer and v.Character ~= nil and v.Character:FindFirstChild("Head") and v.Character.Head:FindFirstChild("cham") == nil then
-				for i,v in pairs (v.Character:GetChildren()) do
-				if v:IsA("MeshPart") or v.Name == "Head" then
-				CreateSG("cham",v,"Back")
-				CreateSG("cham",v,"Front")
-				CreateSG("cham",v,"Left")
-				CreateSG("cham",v,"Right")
-				CreateSG("cham",v,"Right")
-				CreateSG("cham",v,"Top")
-				CreateSG("cham",v,"Bottom")
-				end
-				end
-			end
-		end
-		end
-      		print("button pressed")
-  	end    
-})
-CombatTab:AddButton({
-	Name = "Name ESP",
-	Callback = function()
-_G.TeamCheck = true
-local c = workspace.CurrentCamera
-local ps = game:GetService("Players")
-local lp = ps.LocalPlayer
-local rs = game:GetService("RunService")
-
-local function esp(p,cr)
-	local h = cr:WaitForChild("Humanoid")
-	local hrp = cr:WaitForChild("Head")
-
-	local text = Drawing.new("Text")
-	text.Visible = false
-	text.Center = true
-	text.Outline = false 
-	text.Font = 3
-	text.Size = 16.16
-	text.Color = Color3.new(170,170,170)
-
-	local conection
-	local conection2
-	local conection3
-
-	local function dc()
-		text.Visible = false
-		text:Remove()
-		if conection then
-			conection:Disconnect()
-			conection = nil 
-		end
-		if conection2 then
-			conection2:Disconnect()
-			conection2 = nil 
-		end
-		if conection3 then
-			conection3:Disconnect()
-			conection3 = nil 
-		end
-	end
-
-	conection2 = cr.AncestryChanged:Connect(function(_,parent)
-		if not parent then
-			dc()
-		end
-	end)
-
-	conection3 = h.HealthChanged:Connect(function(v)
-		if (v<=0) or (h:GetState() == Enum.HumanoidStateType.Dead) then
-			dc()
-		end
-	end)
-
-	conection = rs.RenderStepped:Connect(function()
-		local hrp_pos,hrp_onscreen = c:WorldToViewportPoint(hrp.Position)
-		if hrp_onscreen then
-			text.Position = Vector2.new(hrp_pos.X, hrp_pos.Y - 27)
-			text.Text = "[ "..p.Name.." ]"
-			text.Visible = true
-		else
-			text.Visible = false
-		end
-	end)
-end
-
-local function p_added(p)
-	if p.Character then
-		esp(p,p.Character)
-	end
-	p.CharacterAdded:Connect(function(cr)
-		esp(p,cr)
-	end)
-end
-
-for i,p in next, ps:GetPlayers() do 
-	if p ~= lp then
-		p_added(p)
-	end
-end
-
-ps.PlayerAdded:Connect(p_added)
-      		print("button pressed")
-  	end    
-})
-CombatTab:AddButton({
-	Name = "Box ESP",
-	Callback = function()
-        -- settings
-local settings = {
-	defaultcolor = Color3.fromRGB(255,0,0),
-	teamcheck = false,
-	teamcolor = true
- };
- 
- -- services
- local runService = game:GetService("RunService");
- local players = game:GetService("Players");
- 
- -- variables
- local localPlayer = players.LocalPlayer;
- local camera = workspace.CurrentCamera;
- 
- -- functions
- local newVector2, newColor3, newDrawing = Vector2.new, Color3.new, Drawing.new;
- local tan, rad = math.tan, math.rad;
- local round = function(...) local a = {}; for i,v in next, table.pack(...) do a[i] = math.round(v); end return unpack(a); end;
- local wtvp = function(...) local a, b = camera.WorldToViewportPoint(camera, ...) return newVector2(a.X, a.Y), b, a.Z end;
- 
- local espCache = {};
- local function createEsp(player)
-	local drawings = {};
-	
-	drawings.box = newDrawing("Square");
-	drawings.box.Thickness = 1;
-	drawings.box.Filled = false;
-	drawings.box.Color = settings.defaultcolor;
-	drawings.box.Visible = false;
-	drawings.box.ZIndex = 2;
- 
-	drawings.boxoutline = newDrawing("Square");
-	drawings.boxoutline.Thickness = 3;
-	drawings.boxoutline.Filled = false;
-	drawings.boxoutline.Color = newColor3();
-	drawings.boxoutline.Visible = false;
-	drawings.boxoutline.ZIndex = 1;
- 
-	espCache[player] = drawings;
- end
- 
- local function removeEsp(player)
-	if rawget(espCache, player) then
-		for _, drawing in next, espCache[player] do
-			drawing:Remove();
-		end
-		espCache[player] = nil;
-	end
- end
- 
- local function updateEsp(player, esp)
-	local character = player and player.Character;
-	if character then
-		local cframe = character:GetModelCFrame();
-		local position, visible, depth = wtvp(cframe.Position);
-		esp.box.Visible = visible;
-		esp.boxoutline.Visible = visible;
- 
-		if cframe and visible then
-			local scaleFactor = 1 / (depth * tan(rad(camera.FieldOfView / 2)) * 2) * 1000;
-			local width, height = round(4 * scaleFactor, 5 * scaleFactor);
-			local x, y = round(position.X, position.Y);
- 
-			esp.box.Size = newVector2(width, height);
-			esp.box.Position = newVector2(round(x - width / 2, y - height / 2));
-			esp.box.Color = settings.teamcolor and player.TeamColor.Color or settings.defaultcolor;
- 
-			esp.boxoutline.Size = esp.box.Size;
-			esp.boxoutline.Position = esp.box.Position;
-		end
-	else
-		esp.box.Visible = false;
-		esp.boxoutline.Visible = false;
-	end
- end
- 
- -- main
- for _, player in next, players:GetPlayers() do
-	if player ~= localPlayer then
-		createEsp(player);
-	end
- end
- 
- players.PlayerAdded:Connect(function(player)
-	createEsp(player);
- end);
- 
- players.PlayerRemoving:Connect(function(player)
-	removeEsp(player);
- end)
- 
- runService:BindToRenderStep("esp", Enum.RenderPriority.Camera.Value, function()
-	for player, drawings in next, espCache do
-		if settings.teamcheck and player.Team == localPlayer.Team then
-			continue;
-		end
- 
-		if drawings and player ~= localPlayer then
-			updateEsp(player, drawings);
-		end
-	end
- end)
-      		print("button pressed")
-  	end    
-})
--- MISC TAB
-local MiscTab = Window:MakeTab({
-	Name = "Misc",
-	Icon = "nil",
-	PremiumOnly = false
-})
-local Section = MiscTab:AddSection({
-	Name = "Script Hub"
-})
-MiscTab:AddButton({
-	Name = "Destroy Script",
-	Callback = function()
-        OrionLib:Destroy()
-      		print("button pressed")
-  	end    
-})
-MiscTab:AddButton({
-	Name = "Infinite Yield",
-	Callback = function()
-        loadstring(game:HttpGet('https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source'))()
-      		print("button pressed")
-  	end    
-})
-MiscTab:AddButton({
-	Name = "Fates Admin",
-	Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/fatesc/fates-admin/main/main.lua"))();
-      		print("button pressed")
-  	end    
-})
-MiscTab:AddButton({
-	Name = "CMD-X Admin",
-	Callback = function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/CMD-X/CMD-X/master/Source", true))()
-      		print("button pressed")
-  	end    
-})
-local Section = MiscTab:AddSection({
-	Name = "Game Hub"
-})
-MiscTab:AddButton({
-	Name = "Rejoin Server",
-	Callback = function()
-		local tpservice= game:GetService("TeleportService")
-		local plr = game.Players.LocalPlayer
-		tpservice:Teleport(game.PlaceId, plr)
-      		print("button pressed")
-  	end    
-})
-MiscTab:AddButton({
-	Name = "Server Hop",
-	Callback = function()
-        local module = loadstring(game:HttpGet"https://raw.githubusercontent.com/LeoKholYt/roblox/main/lk_serverhop.lua")()
-		module:Teleport(game.PlaceId)
-      		print("button pressed")
-  	end    
-})
-MiscTab:AddButton({
-	Name = "Chat Spy",
-	Callback = function()
-		--[[
-			Simple Chat Spy
-			Type "spy" to enable or disable the chat spy.
-			Only tested if this works executed with Synapse (should work with other exploits though)
-			--]]
-			print("-- Chat Spy Executed --")
-			print("Type \"spy\" to enable or disable the chat spy.")
-			print("Only tested if this works executed with Synapse (should work with other exploits though)")
-			print("https://github.com/dehoisted/Chat-Spy")
-			-- Config
-			Config = {
-			enabled = true,
-			spyOnMyself = true,
-			public = false,
-			publicItalics = true
-			}
-			-- Customizing Log Output
-			PrivateProperties = {
-			Color = Color3.fromRGB(0,255,255);
-			Font = Enum.Font.SourceSansBold;
-			TextSize = 18;
-			}
-			local StarterGui = game:GetService("StarterGui")
-			local Players = game:GetService("Players")
-			local player = Players.LocalPlayer
-			local saymsg = game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("SayMessageRequest")
-			local getmsg = game:GetService("ReplicatedStorage"):WaitForChild("DefaultChatSystemChatEvents"):WaitForChild("OnMessageDoneFiltering")
-			local instance = (_G.chatSpyInstance or 0) + 1
-			_G.chatSpyInstance = instance
-			local function onChatted(p,msg)
-			if _G.chatSpyInstance == instance then
-			if p==player and msg:lower():sub(1,4)=="/spy" then
-			Config.enabled = not Config.enabled
-			wait(0.3)
-			PrivateProperties.Text = "{SPY "..(Config.enabled and "EN" or "DIS").."ABLED}"
-			StarterGui:SetCore("ChatMakeSystemMessage", PrivateProperties)
-			elseif Config.enabled and (Config.spyOnMyself==true or p~=player) then
-			msg = msg:gsub("[\n\r]",''):gsub("\t",' '):gsub("[ ]+",' ')
-			local hidden = true
-			local conn = getmsg.OnClientEvent:Connect(function(packet,channel)
-			if packet.SpeakerUserId==p.UserId and packet.Message==msg:sub(#msg-#packet.Message+1) and (channel=="All" or (channel=="Team" and Config.public==false and Players[packet.FromSpeaker].Team==player.Team)) then
-			hidden = false
-			end
-			end)
-			wait(1)
-			conn:Disconnect()
-			if hidden and Config.enabled then
-			if Config.public then
-			saymsg:FireServer((Config.publicItalics and "/me " or '').."{SPY} [".. p.Name .."]: "..msg,"All")
-			else
-			PrivateProperties.Text = "{SPY} [".. p.Name .."]: "..msg
-			StarterGui:SetCore("ChatMakeSystemMessage", PrivateProperties)
-			end
-			end
-			end
-			end
-			end
-			for _,p in ipairs(Players:GetPlayers()) do
-			p.Chatted:Connect(function(msg) onChatted(p,msg) end)
-			end
-			Players.PlayerAdded:Connect(function(p)
-			p.Chatted:Connect(function(msg) onChatted(p,msg) end)
-			end)
-			PrivateProperties.Text = "{SPY "..(Config.enabled and "EN" or "DIS").."ABLED}"
-			StarterGui:SetCore("ChatMakeSystemMessage", PrivateProperties)
-			local chatFrame = player.PlayerGui.Chat.Frame
-			chatFrame.ChatChannelParentFrame.Visible = true
-			chatFrame.ChatBarParentFrame.Position = chatFrame.ChatChannelParentFrame.Position+UDim2.new(UDim.new(),chatFrame.ChatChannelParentFrame.Size.Y)	
-      		print("button pressed")
-  	end    
-})
-MiscTab:AddButton({
-	Name = "Destroy NoobCam",
-	Callback = function()
-	local NoobCam= Workspace.NoobCam
-	NoobCam:Destroy()
-	NoobCam.Parent = Workspace
-      		print("button pressed")
-  	end    
-})
-MiscTab:AddButton({
-	Name = "Destroy ZombieCam",
-	Callback = function()
-	local ZombieCam= Workspace.ZombieCam
-	ZombieCam:Destroy()
-	ZombieCam.Parent = Workspace
-      		print("button pressed")
-  	end    
-})
-local Section = MiscTab:AddSection({
-	Name = "Lobby"
-})
-MiscTab:AddButton({
-	Name = "Coffee",
-	Callback = function()
-		local args = {
-		[1] = workspace.Lobby:FindFirstChild("Takeo Grounds"):FindFirstChild("Lil' Takeo Hut"):FindFirstChild("Takeo Noob").Head.Dialog.MoreChoices.MoreChoices.Coffee
-		}
-		workspace.Lobby:FindFirstChild("Takeo Grounds"):FindFirstChild("Lil' Takeo Hut"):FindFirstChild("Takeo Noob").Head.Dialog.DialogEvent:FireServer(unpack(args))
-      		print("button pressed")
-  	end    
-})
-MiscTab:AddButton({
-	Name = "Skip Loading Screen",
-	Callback = function()
-		local LoadingGui = PreloadScript.LoadingGui
-		LoadingGui:Destroy()
-		LoadingGui.Parent = PreloadScript
-      		print("button pressed")
-  	end    
-})
--- CREDITS TAB
-local CreditsTab = Window:MakeTab({
-	Name = "Credits",
-	Icon = "nil",
-	PremiumOnly = false
-})
-CreditsTab:AddLabel("Programmers: Private Zenom")
-CreditsTab:AddLabel("Tester: Shmisco")
-CreditsTab:AddLabel("Showcaser: Shmisco")
-OrionLib:Init()
-    end,
- })
- 
 ----------------------------------------------------------------------------------------------------------- Fourth Tab ---------------------------------------------------------------------------------------------------------
 
 local Tab = Window:CreateTab("Steal Supports") -- Title, Image'
